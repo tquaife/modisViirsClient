@@ -126,7 +126,7 @@ class modViirRequest:
         self.url=self.base_url+self.api_version+'/'
 
         
-    def generate_single_request(self,start_date,end_date):   
+    def get_url(self,start_date,end_date):   
         """Generate a single request URL based 
         on which arguments have been specified 
         when the class was created.
@@ -213,36 +213,54 @@ class modViirRequest:
         #generate the list of requests:
         request_list=[]
         for (start_date,end_date) in zip(start_list,end_list):
-            request_list.append(self.generate_single_request(start_date,end_date))
+            request_list.append(self.get_url(start_date,end_date))
             
         return request_list
 
 
 
-class modViirRequestSite(modViirRequest):
-    def __init__(self,site_id=None):
-        self.site_id=site_id
-        modViirRequest.__init__(self)
+#class modViirRequestSite(modViirRequest):
+#    def __init__(self,site_id=None):
+#        self.site_id=site_id
+#        modViirRequest.__init__(self)
 
-    def generate_request(self):   
-        """Generate a request URL based on which
-        arguments have been specified when the 
-        class was created.
-        """
-        request_url=self.url
+#    def generate_request(self):   
+#        """Generate a request URL based on which
+#        arguments have been specified when the 
+#        class was created.
+#        """
+#        request_url=self.url
 
-        if self.site_id==None:
-            request_url+='sites'
-            return request_url
+#        if self.site_id==None:
+#            request_url+='sites'
+#            return request_url
 
 
 class modViirData:
     def __init__(self):
+        """A basic class for handling small amounts of satellite
+        data such as that from the ORNL web service"""
+        
         self.attribute_list=[]
+        
+        #"data" is a dictionary that should be indexed
+        #by (e.g.) the name of the band.
+        self.data={}
 
     def filterQA( self, databand, qaband, QAOK, fill=np.nan ):
         """replace any data that doesn't pass QA checks
-        with a fill value"""
+        with a fill value
+        
+        
+        databand  -- (string) the dictionary index for the data 
+                     band to be filtered
+        qaband    -- (string) the dictionary index for the data 
+                     band containing QA/QC data
+        QAOK      -- a numpy array of QA/QC values that the user
+                     to allow through the filtering
+        fill      -- (any) the value to put in place of filtered
+                     data.                    
+        """
         
         if np.size( self.data[databand] ) != np.size( self.data[qaband] ):
             raise Exception, 'data and QA are different sizes'
@@ -262,8 +280,11 @@ class modViirData:
 
 def parseModViirJSON(request):
     """
+    A factory function that returns an instance of the 
+    modViirData class populated with data retrieved 
+    from the ORNL Web Service.
     
-    request -- instance of the modViirRequest
+    request -- instance of the modViirRequest class
     """
 
     #list of items to treat separately
@@ -303,7 +324,6 @@ def parseModViirJSON(request):
         n_dates=len(m.dates)           
         ndate_counter=0
         
-        m.data={}
         for (k,jsn) in enumerate(json_data):            
             for (n,item) in enumerate(jsn['subset']):
                 
