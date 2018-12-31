@@ -1,6 +1,6 @@
 # modisViirsClient
 
-Provides an interface to the ORNL Web Service REST API for MODIS and VIIRS-NPP data, and a basic class for handling small amounts of satellite data.
+Provides an interface to the ORNL Web Service REST API for MODIS and VIIRS-NPP data, and a basic class for handling small amounts of satellite data :artificial_satellite:
 
 ## Some examples:
 
