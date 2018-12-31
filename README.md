@@ -12,6 +12,8 @@ Interrogate the server to explore the types of data available.
 
 Download and plot leaf area index (LAI) data for a site from both MODIS instruments and VIIRS.
 
+![LAI time series](modisViirs_example_lai.png)
+
 ## Relevant pages at ORNL:
 
 https://modis.ornl.gov/data/modis_webservice.html
