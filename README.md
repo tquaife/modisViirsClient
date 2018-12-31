@@ -8,7 +8,7 @@ Provides an interface to the ORNL Web Service REST API for MODIS and VIIRS-NPP d
 
 Interrogate the server to explore the types of data available.
 
-### modisViirs_example_lai.py
+### modisViirs_example_lai_timeseries.py
 
 Download and plot leaf area index (LAI) data for a site from both MODIS instruments and VIIRS.
 
