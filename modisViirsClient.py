@@ -31,14 +31,14 @@ import sys
 from datetime import datetime, date
 
 import json
-from StringIO import StringIO
+import io 
 
 import pycurl
 import numpy as np
 
 
 def __error( msg ):
-    raise Exception, msg
+    raise Exception
         
 def latLonErr( ):
     __error( 'Latitude and longitude must both be specified' )
@@ -62,16 +62,16 @@ def readURL(url, header=['Accept: application/json']):
     """Use pyCurl to read the contents of a 
     URL into a StringIO buffer.
     """
-    buff = StringIO()
+    e = io.BytesIO()
     c = pycurl.Curl()
+    c.setopt(pycurl.WRITEFUNCTION, e.write)
     c.setopt(c.URL, url)
-    c.setopt(c.WRITEDATA, buff)
     c.setopt(c.HTTPHEADER, header)
+    
     c.perform()
     http_status=c.getinfo(pycurl.HTTP_CODE)
     c.close()    
-    return buff.getvalue(), http_status
-
+    return e.getvalue().decode('UTF-8'), http_status
 
 def getJSONData(url):
     """Download JSON data and raise an exception
@@ -82,7 +82,7 @@ def getJSONData(url):
     body, status=readURL(url)
     if status not in status_OK:
         msg=json.dumps(json.loads(body),indent=4)
-        raise Exception, "Sever returned status code: %d\n%s"%(status,msg)
+        raise Exception
     return json.loads(body)
 
 
@@ -131,7 +131,7 @@ class modViirRequest:
         on which arguments have been specified 
         when the class was created.
         
-        Note that starte_date and end_date
+        Note that start_date and end_date
         
         """
         request_url=self.url
@@ -263,15 +263,15 @@ class modViirData:
         """
         
         if np.size( self.data[databand] ) != np.size( self.data[qaband] ):
-            raise Exception, 'data and QA are different sizes'
+            raise Exception
                 
         t=np.shape( self.data[databand] )[0]
         r=np.shape( self.data[databand] )[1]
         c=np.shape( self.data[databand] )[2]
         
-        for i in xrange( t ):
-            for j in xrange( r ):
-                for k in xrange( c ):
+        for i in range( t ):
+            for j in range( r ):
+                for k in range( c ):
                     if np.sum( QAOK == self.data[qaband][i,j,k] ) == 0:
                         self.data[databand][i,j,k] = fill
 
@@ -334,8 +334,8 @@ def parseModViirJSON(request):
                                 
                 #pack the data into a numpy array
                 pos=m.modis_dates.index(item['modis_date'])
-                for i in xrange(m.nrows):
-                    for j in xrange(m.ncols):                        
+                for i in range(m.nrows):
+                    for j in range(m.ncols):                        
                         m.data[band][pos,i,j]=item['data'][i*m.ncols+j]
      
     return m  
@@ -348,9 +348,10 @@ if __name__=="__main__":
 
     #print a list of products that are currently on the server:
     r=modViirRequest()
+    #print(r.generate_request())
     m=parseModViirJSON(r)
     for p in m.products:
-        print p['product'], ' '*(12-len(p['product'])), p['description']
+        print(( p['product'], ' '*(12-len(p['product'])), p['description'] ))
 
 
  
